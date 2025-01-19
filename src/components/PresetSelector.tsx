@@ -25,7 +25,7 @@ export default function PresetSelector({
         seconds: parseInt(newPresetSeconds),
       }
       const updatedPresets = [...presets, newPreset]
-      setPresets(updatedPresets)
+      setPresets(updatedPresets as Preset[])
       await localforage.setItem('presets', updatedPresets)
       setNewPresetName('')
       setNewPresetSeconds('')
