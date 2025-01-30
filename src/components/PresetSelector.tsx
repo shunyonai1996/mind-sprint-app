@@ -21,11 +21,12 @@ export default function PresetSelector({
   async function handleAddPreset() {
     if (newPresetName && newPresetSeconds) {
       const newPreset = {
+        id: crypto.randomUUID(),
         name: newPresetName,
         seconds: parseInt(newPresetSeconds),
       }
       const updatedPresets = [...presets, newPreset]
-      setPresets(updatedPresets as Preset[])
+      setPresets(updatedPresets)
       await localforage.setItem('presets', updatedPresets)
       setNewPresetName('')
       setNewPresetSeconds('')

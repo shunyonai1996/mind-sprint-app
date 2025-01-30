@@ -5,6 +5,29 @@ import "react-circular-progressbar/dist/styles.css"
 import { Play, Pause, SkipForward, Moon, Sun, X } from "lucide-react"
 import moveNextSet from '/public/sound/move_next_set.mp3'
 
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioBuffer: AudioBuffer | null = null;
+
+// 音声ファイルを事前にロード
+async function loadSound() {
+  try {
+    const response = await fetch(moveNextSet);
+    const arrayBuffer = await response.arrayBuffer();
+    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  } catch (error) {
+    console.error('音声ファイルのロードに失敗:', error);
+  }
+}
+
+function playSound() {
+  if (audioBuffer && audioContext) {
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+  }
+}
+
 export default function Start() {
   const { minutes, seconds, isRunning, start, pause, restart, selectedPreset, addSession, theme, setTheme } =
     useTimerContext()
@@ -92,16 +115,27 @@ export default function Start() {
     setShowSummaryPopup(true)
   }
 
-  function playSound() {
-    const audio = new Audio(moveNextSet);
-    audio.play()
-    .then(() => {
-      console.log("Audio is playing.");
-    })
-  .catch(error => {
-      console.log(error);
-    });
-  }
+  // コンポーネントのマウント時に音声をロード
+  useEffect(() => {
+    loadSound();
+  }, []);
+
+  useEffect(() => {
+    // ユーザーの最初のインタラクション時にAudioContextを開始
+    const handleUserInteraction = () => {
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    };
+
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+  }, []);
 
   function handleSummaryClose() {
     setShowSummaryPopup(false)
