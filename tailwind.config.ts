@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         primary: {
           DEFAULT: "var(--color-primary)",
+          light: "var(--color-primary-light)",
           dark: "#3a7bc8",
         },
         secondary: {
@@ -13,7 +14,11 @@ module.exports = {
           dark: "#3fa396",
         },
         background: "var(--color-background)",
-        text: "var(--color-text)",
+        text: {
+          DEFAULT: 'var(--color-text)',
+          dark: 'var(--color-dark-text)',
+        },
+        attr_dark: 'var(--color-dark-text)',
       },
     },
   },
