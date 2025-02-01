@@ -8,7 +8,6 @@ import moveNextSet from '/public/sound/move_next_set.mp3'
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let audioBuffer: AudioBuffer | null = null;
 
-// 音声ファイルを事前にロード
 async function loadSound() {
   try {
     const response = await fetch(moveNextSet);
@@ -40,7 +39,6 @@ export default function Start() {
   const remainingSeconds = minutes * 60 + seconds
   const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100
 
-  // 0秒を下回った場合の経過時間を計算
   useEffect(() => {
     if (remainingSeconds == 0) {
       const interval = setInterval(() => {
@@ -58,7 +56,6 @@ export default function Start() {
     }
   }, [remainingSeconds])
 
-  // selectedPresetが変更されたときにタイマーを更新するuseEffect
   useEffect(() => {
     const time = new Date()
     time.setSeconds(time.getSeconds() + selectedPreset.seconds)
@@ -66,15 +63,14 @@ export default function Start() {
     pause()
   }, [selectedPreset])
 
-  // 表示用の時間を計算
   const displayTime =
   remainingSeconds == 0 ? overTime : remainingSeconds;
 
   const timerColor = remainingSeconds == 0
-    ? "#ff4136" // 経過時間表示中は赤色
+    ? "#ff4136"
     : theme === "dark"
-    ? "#64b5f6" // ダークテーマ時
-    : "#4a90e2"; // ライトテーマ時
+    ? "#64b5f6"
+    : "#4a90e2";
   const backgroundColor = theme === "dark" ? "#1a1a1a" : "#f5f7fa"
   const textColor = theme === "dark" ? "#f5f5f5" : "#333333"
 
@@ -106,22 +102,19 @@ export default function Start() {
 
   function confirmExit() {
     pause()
-    // 最後のセットの時間を計算して追加
     const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
-    if (completedTime > 0) {  // 時間が0より大きい場合のみ追加
+    if (completedTime > 0) {
       setCompletedSets(prev => [...prev, completedTime])
     }
     setShowExitPopup(false)
     setShowSummaryPopup(true)
   }
 
-  // コンポーネントのマウント時に音声をロード
   useEffect(() => {
     loadSound();
   }, []);
 
   useEffect(() => {
-    // ユーザーの最初のインタラクション時にAudioContextを開始
     const handleUserInteraction = () => {
       if (audioContext.state === 'suspended') {
         audioContext.resume();
@@ -139,11 +132,11 @@ export default function Start() {
 
   function handleSummaryClose() {
     setShowSummaryPopup(false)
-    setCompletedSets([]) // 完了セットをクリア
+    setCompletedSets([])
     const time = new Date()
     time.setSeconds(time.getSeconds() + selectedPreset.seconds)
-    restart(time) // タイマーを初期値に戻す
-    pause() // タイマーを停止状態にする
+    restart(time)
+    pause()
   }
 
   return (
@@ -152,7 +145,6 @@ export default function Start() {
         className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds == 0 ? "bg-red-100 dark:bg-red-900" : ""}`}
       >
         <div className="w-72 h-72 mx-auto mt-0 mb-0">
-          {/* 終了ボタン */}
           <button
             onClick={() => handleExit()}
             className="absolute top-1 left-1 px-4 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
@@ -179,7 +171,6 @@ export default function Start() {
           />
         </div>
 
-          {/* 時間制御 */}
           <div className="flex justify-between">
             <button
               onClick={handleStart}
@@ -214,7 +205,6 @@ export default function Start() {
         </div>
         )}
 
-        {/* 終了POPUP */}
         {showExitPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="text-center bg-white dark:bg-gray-800 rounded-lg p-10">
@@ -231,7 +221,6 @@ export default function Start() {
             </div>
           )}
 
-        {/* サマリーPOPUP */}
         {showSummaryPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-8 w-96 max-w-[90%]">

@@ -2,12 +2,7 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import { useTimer } from "react-timer-hook"
 import localforage from "localforage"
-
-type Preset = {
-  name: string
-  seconds: number
-}
-
+import { Preset } from "../types"
 type TimerContextType = {
   presets: Preset[]
   selectedPreset: Preset
@@ -29,9 +24,9 @@ type TimerContextType = {
 const TimerContext = createContext<TimerContextType | undefined>(undefined)
 
 const defaultPresets: Preset[] = [
-  { name: "1分", seconds: 60 },
-  { name: "55秒", seconds: 55 },
-  { name: "1分5秒", seconds: 65 },
+  { id: "1", name: "1分", seconds: 60 },
+  { id: "2", name: "55秒", seconds: 55 },
+  { id: "3", name: "1分5秒", seconds: 65 },
 ]
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
@@ -39,7 +34,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [selectedPreset, setSelectedPreset] = useState<Preset>(presets[0])
   const [sessionCount, setSessionCount] = useState(0)
   const [totalTime, setTotalTime] = useState(0)
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [theme, setTheme] = useState<"light" | "dark">("dark")
 
   const { seconds, minutes, isRunning, start, pause, restart } = useTimer({
     expiryTimestamp: new Date(Date.now() + selectedPreset.seconds * 1000),
