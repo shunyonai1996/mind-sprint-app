@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useTimerContext } from '../contexts/TimerContext'
 import { Bar } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
@@ -6,26 +6,39 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export default function Records() {
-  const { sessionCount, totalTime } = useTimerContext()
+  const { summaries } = useTimerContext()
   const [activeTab, setActiveTab] = useState('today')
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}分${remainingSeconds}秒`
-  }
+  const filteredSummaries = useMemo(() => {
+    const now = new Date()
+    return summaries.filter(summary => {
+      const summaryDate = new Date(summary.date)
+      switch (activeTab) {
+        case 'today':
+          return summaryDate.toDateString() === now.toDateString()
+        case 'month':
+          return summaryDate.getMonth() === now.getMonth() &&
+                 summaryDate.getFullYear() === now.getFullYear()
+        case 'year':
+          return summaryDate.getFullYear() === now.getFullYear()
+        default:
+          return true
+      }
+    })
+  }, [summaries, activeTab])
 
   const data = {
-    labels: ['セット数', '実施時間 (分)', '実施回数'],
-    datasets: [
-      {
-        label: '記録',
-        data: [sessionCount, Math.floor(totalTime / 60), sessionCount],
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-      },
-    ],
+    labels: ['セット数', '実施時間 (分)'],
+    datasets: [{
+      label: '記録',
+      data: [
+        filteredSummaries.reduce((acc, curr) => acc + curr.setCount, 0),
+        Math.floor(filteredSummaries.reduce((acc, curr) => acc + curr.totalTime, 0) / 60)
+      ],
+      backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }]
   }
 
   const options = {
@@ -34,6 +47,12 @@ export default function Records() {
         beginAtZero: true,
       },
     },
+  }
+
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    return `${minutes.toString().padStart(2, '0')}分${seconds.toString().padStart(2, '0')}秒`
   }
 
   return (
@@ -51,9 +70,22 @@ export default function Records() {
         ))}
       </div>
       <div className="mb-4">
-        <p>セット数: {sessionCount}</p>
-        <p>実施時間: {formatTime(totalTime)}</p>
-        <p>実施回数: {sessionCount}</p>
+        <h3 className="text-lg font-bold mb-2">実施履歴</h3>
+        <div className="space-y-4">
+          {filteredSummaries.map(summary => (
+            <div key={summary.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <p className="text-sm text-gray-500 dark:text-gray-300">
+                {new Date(summary.date).toLocaleDateString('ja-JP')}
+              </p>
+              <p>
+                セット数: <span className="font-bold">{summary.setCount}</span>
+              </p>
+              <p>
+                合計時間: <span className="font-bold">{formatTime(summary.totalTime)}</span>
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="h-64">
         <Bar data={data} options={options} />

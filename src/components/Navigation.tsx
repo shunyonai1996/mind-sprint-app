@@ -7,10 +7,9 @@ type NavigationProps = {
 
 export default function Navigation({ activeSection, setActiveSection }: NavigationProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg z-50">
       <ul className="flex justify-around">
-        {/* {['start', 'myTimer', 'records'].map((section) => ( */}
-        {['start', 'myTimer'].map((section) => (
+        {['start', 'myTimer', 'records'].map((section) => (
           <li key={section}>
             <button
               onClick={() => setActiveSection(section)}

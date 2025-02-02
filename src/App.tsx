@@ -11,7 +11,7 @@ function AppContent() {
   const [activeSection, setActiveSection] = useState('start')
 
   return (
-    <div className={`min-h-screen bg-background text-text p-4 transition-colors duration-300 ${theme}`}>
+    <div className={`min-h-screen bg-background text-text p-4 pb-20 transition-colors duration-300 ${theme}`}>
       <div className="max-w-md mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -25,10 +25,9 @@ function AppContent() {
             {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
           </button>
         </div>
-        {/* <h1 className="text-3xl font-bold text-primary mb-6">0秒思考特化タイマー『MindSprint』</h1> */}
         {activeSection === 'start' && <Start />}
         {activeSection === 'myTimer' && <MyTimer />}
-        {/* {activeSection === 'records' && <Records />} */}
+        {activeSection === 'records' && <Records />}
         <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
       </div>
     </div>

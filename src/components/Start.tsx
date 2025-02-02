@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react"
 import { useTimerContext } from "../contexts/TimerContext"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import { Play, Pause, SkipForward, Moon, Sun, X } from "lucide-react"
+import { Play, Pause, SkipForward } from "lucide-react"
 import moveNextSet from '/public/sound/move_next_set.mp3'
+import AssociateLinks from "./AssociateLinks"
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 let audioBuffer: AudioBuffer | null = null;
@@ -28,7 +29,7 @@ function playSound() {
 }
 
 export default function Start() {
-  const { minutes, seconds, isRunning, start, pause, restart, selectedPreset, addSession, theme, setTheme } =
+  const { minutes, seconds, isRunning, start, pause, restart, selectedPreset, addSession, theme, setTheme, saveSummary } =
     useTimerContext()
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [completedSets, setCompletedSets] = useState<number[]>([])
@@ -85,8 +86,6 @@ export default function Start() {
   }
 
   function handleNextSet() {
-    console.log(totalSeconds)
-    console.log(remainingSeconds)
     const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
     setCompletedSets((prev) => [...prev, completedTime])
     setOverTime(0);
@@ -130,7 +129,18 @@ export default function Start() {
     };
   }, []);
 
-  function handleSummaryClose() {
+  function handleSummaryClose(save: boolean) {
+    if (save) {
+      const summary = {
+        setCount: completedSets.length,
+        totalTime: completedSets.reduce((acc, curr) => acc + curr, 0),
+        sets: completedSets.map((time, index) => ({
+          setNumber: index + 1,
+          time
+        }))
+      }
+      saveSummary(summary)
+    }
     setShowSummaryPopup(false)
     setCompletedSets([])
     const time = new Date()
@@ -237,18 +247,25 @@ export default function Start() {
                   </p>
                 ))}
               </div>
-              <div className="flex justify-center">
+              <div className="flex justify-center space-x-4">
                 <button
-                  onClick={handleSummaryClose}
+                  onClick={() => handleSummaryClose(false)}
                   className="btn btn-secondary"
                 >
-                  閉じる
+                  保存しない
+                </button>
+                <button
+                  onClick={() => handleSummaryClose(true)}
+                  className="btn btn-primary"
+                >
+                  保存する
                 </button>
               </div>
             </div>
           </div>
         )}
       </div>
+      <AssociateLinks></AssociateLinks>
     </div>
   )
 }
