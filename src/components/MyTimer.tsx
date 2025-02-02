@@ -5,7 +5,8 @@ import { Trash2 } from 'lucide-react'
 import { Preset } from '../types'
 
 export default function MyTimer() {
-  const { presets, selectedPreset, setSelectedPreset, setPresets } = useTimerContext()
+  const { defaultPresets, customPresets, selectedPreset, setSelectedPreset, setCustomPresets, saveCustomPresets } = useTimerContext()
+  const allPresets = [...defaultPresets, ...customPresets]
 
   type Minutes = string
   type Seconds = string
@@ -20,33 +21,39 @@ export default function MyTimer() {
     const minutesNum = parseInt(minutes, 10)
     const secondsNum = parseInt(seconds, 10)
     const totalSeconds = (minutesNum * 60) + secondsNum
+    const checkPreset = allPresets.find(item => item.seconds === totalSeconds)
 
     if (totalSeconds > 0) {
+      if (checkPreset) {
+        alert('既に登録済みのタイマーです')
+        return
+      }
       const newPreset = {
         id: crypto.randomUUID(),
         name: `${minutesNum}分${secondsNum}秒`,
         seconds: totalSeconds,
       }
-      const updatedPresets = [...presets, newPreset]
-      setPresets(updatedPresets)
+      const updatedPresets = [...customPresets, newPreset]
+      setCustomPresets(updatedPresets)
       setSelectedPreset(newPreset)
-      setMinutes('')
-      setSeconds('')
+      saveCustomPresets(updatedPresets)
+      setMinutes(minutes)
+      setSeconds(seconds)
     } else {
       alert('1秒以上の時間を指定して下さい')
     }
   }
 
   function handleResetToDefault() {
-    setSelectedPreset(presets[0])
+    setSelectedPreset(defaultPresets[0])
   }
 
   function handleDeletePreset(preset: Preset) {
-    const updatedPresets = presets.filter(p => p.name !== preset.name)
-    setPresets(updatedPresets)
+    const updatedPresets = customPresets.filter(p => p.name !== preset.name)
+    setCustomPresets(updatedPresets)
 
     if (selectedPreset.name === preset.name) {
-      setSelectedPreset(updatedPresets[0])
+      setSelectedPreset(defaultPresets[0])
     }
   }
 
@@ -76,7 +83,7 @@ export default function MyTimer() {
       </div>
       <div className="flex flex-col mb-8">
         <h3 className="text-2xl font-bold mb-4 text-primary">カスタム一覧</h3>
-        {presets.map((preset, index) => (
+        {allPresets.map((preset, index) => (
           <div key={preset.name} className="flex justify-between gap-2 ">
             <div onClick={() => setSelectedPreset(preset)} className="flex justify-center gap-2 items-center p-2 rounded-md">
               <span className="text-lg font-bold text-text">{index + 1}. </span>
@@ -93,17 +100,18 @@ export default function MyTimer() {
               >
                 {selectedPreset.name === preset.name ? '設定中' : '選択'}
               </button>
-              <button
-                onClick={() => handleDeletePreset(preset)}
-                className="btn btn-danger"
-                aria-label="削除"
-              >
-                <Trash2 size={18} />
-              </button>
+              {customPresets.some(item => item.name === preset.name) && (
+                <button
+                  onClick={() => handleDeletePreset(preset)}
+                  className="btn btn-danger"
+                  aria-label="削除"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
             </div>
           </div>
-          ))}
-        {/* </select> */}
+        ))}
       </div>
       <div className="flex justify-center gap-2 mb-4">
         <button onClick={handleResetToDefault} className="btn btn-secondary">
@@ -113,4 +121,3 @@ export default function MyTimer() {
     </div>
   )
 }
-

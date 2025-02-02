@@ -3,11 +3,24 @@ import { createContext, useContext, useState, useEffect } from "react"
 import { useTimer } from "react-timer-hook"
 import localforage from "localforage"
 import { Preset } from "../types"
+
+type Summary = {
+  id: string
+  date: Date
+  setCount: number
+  totalTime: number
+  sets: {
+    setNumber: number
+    time: number
+  }[]
+}
+
 type TimerContextType = {
-  presets: Preset[]
+  defaultPresets: Preset[]
+  customPresets: Preset[]
   selectedPreset: Preset
   setSelectedPreset: (preset: Preset) => void
-  setPresets: (presets: Preset[]) => void
+  setCustomPresets: (presets: Preset[]) => void
   minutes: number
   seconds: number
   isRunning: boolean
@@ -19,6 +32,9 @@ type TimerContextType = {
   addSession: () => void
   theme: "light" | "dark"
   setTheme: (theme: "light" | "dark") => void
+  saveCustomPresets: (customPresets: Preset[]) => void
+  summaries: Summary[]
+  saveSummary: (summary: Omit<Summary, 'id' | 'date'>) => void
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined)
@@ -30,11 +46,12 @@ const defaultPresets: Preset[] = [
 ]
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const [presets, setPresets] = useState<Preset[]>(defaultPresets)
-  const [selectedPreset, setSelectedPreset] = useState<Preset>(presets[0])
+  const [customPresets, setCustomPresets] = useState<Preset[]>([])
+  const [selectedPreset, setSelectedPreset] = useState<Preset>(defaultPresets[0])
   const [sessionCount, setSessionCount] = useState(0)
   const [totalTime, setTotalTime] = useState(0)
   const [theme, setTheme] = useState<"light" | "dark">("dark")
+  const [summaries, setSummaries] = useState<Summary[]>([])
 
   const { seconds, minutes, isRunning, start, pause, restart } = useTimer({
     expiryTimestamp: new Date(Date.now() + selectedPreset.seconds * 1000),
@@ -43,22 +60,34 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    loadPresetsFromStorage()
-    loadSessionInfoFromStorage()
+    loadPresets()
+    loadSessionInfo()
+    loadSummaries()
   }, [])
 
-  async function loadPresetsFromStorage() {
-    const storedPresets = await localforage.getItem<Preset[]>("presets")
+  async function loadPresets() {
+    const storedPresets = await localforage.getItem<Preset[]>("customPresets")
     if (storedPresets) {
-      setPresets([...defaultPresets, ...storedPresets])
+      setCustomPresets(storedPresets)
     }
   }
 
-  async function loadSessionInfoFromStorage() {
+  async function loadSessionInfo() {
     const storedSessionCount = await localforage.getItem<number>("sessionCount")
     const storedTotalTime = await localforage.getItem<number>("totalTime")
     if (storedSessionCount) setSessionCount(storedSessionCount)
     if (storedTotalTime) setTotalTime(storedTotalTime)
+  }
+
+  async function loadSummaries() {
+    const storedSummaries = await localforage.getItem<Summary[]>("summaries")
+    if (storedSummaries) {
+      setSummaries(storedSummaries)
+    }
+  }
+
+  async function saveCustomPresets(customPresets: Preset[]) {
+    await localforage.setItem("customPresets", customPresets)
   }
 
   async function saveSessionInfo() {
@@ -76,11 +105,22 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     saveSessionInfo()
   }
 
+  const saveSummary = async (newSummary: Omit<Summary, 'id' | 'date'>) => {
+    const summary: Summary = {
+      ...newSummary,
+      id: crypto.randomUUID(),
+      date: new Date()
+    }
+    setSummaries(prev => [...prev, summary])
+    await localforage.setItem('summaries', [...summaries, summary])
+  }
+
   const contextValue: TimerContextType = {
-    presets,
+    defaultPresets,
+    customPresets,
     selectedPreset,
     setSelectedPreset,
-    setPresets,
+    setCustomPresets,
     minutes,
     seconds,
     isRunning,
@@ -92,6 +132,9 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     addSession,
     theme,
     setTheme,
+    saveCustomPresets,
+    summaries,
+    saveSummary
   }
 
   return <TimerContext.Provider value={contextValue}>{children}</TimerContext.Provider>
@@ -104,4 +147,3 @@ export function useTimerContext() {
   }
   return context
 }
-
