@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react'
 import { Preset } from '../types'
 
 export default function MyTimer() {
-  const { defaultPresets, customPresets, selectedPreset, setSelectedPreset, setCustomPresets, saveCustomPresets } = useTimerContext()
+  const { defaultPresets, customPresets, selectedPreset, saveSelectedPreset, setCustomPresets, saveCustomPresets } = useTimerContext()
   const allPresets = [...defaultPresets, ...customPresets]
 
   type Minutes = string
@@ -35,7 +35,7 @@ export default function MyTimer() {
       }
       const updatedPresets = [...customPresets, newPreset]
       setCustomPresets(updatedPresets)
-      setSelectedPreset(newPreset)
+      saveSelectedPreset(newPreset)
       saveCustomPresets(updatedPresets)
       setMinutes(minutes)
       setSeconds(seconds)
@@ -45,7 +45,7 @@ export default function MyTimer() {
   }
 
   function handleResetToDefault() {
-    setSelectedPreset(defaultPresets[0])
+    saveSelectedPreset(defaultPresets[0])
   }
 
   function handleDeletePreset(preset: Preset) {
@@ -53,7 +53,7 @@ export default function MyTimer() {
     setCustomPresets(updatedPresets)
 
     if (selectedPreset.name === preset.name) {
-      setSelectedPreset(defaultPresets[0])
+      saveSelectedPreset(defaultPresets[0])
     }
   }
 
@@ -85,13 +85,13 @@ export default function MyTimer() {
         <h3 className="text-2xl font-bold mb-4 text-primary">カスタム一覧</h3>
         {allPresets.map((preset, index) => (
           <div key={preset.name} className="flex justify-between gap-2 ">
-            <div onClick={() => setSelectedPreset(preset)} className="flex justify-center gap-2 items-center p-2 rounded-md">
+            <div onClick={() => saveSelectedPreset(preset)} className="flex justify-center gap-2 items-center p-2 rounded-md">
               <span className="text-lg font-bold text-text">{index + 1}. </span>
               <span className="text-xl font-bold text-text">{preset.name}</span>
             </div>
             <div className="flex justify-center gap-2 items-center p-1 rounded-md">
               <button
-                onClick={() => setSelectedPreset(preset)}
+                onClick={() => saveSelectedPreset(preset)}
                 className={`btn ${
                   selectedPreset.name === preset.name
                   ? 'btn-primary'
