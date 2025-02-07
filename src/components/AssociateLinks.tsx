@@ -85,7 +85,7 @@ export default function AssociateLinks() {
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               台座からさっと取り出せるノック要らずのペン。<br/>
-              キャップもないため、0秒でメモ書きを始められる。
+              キャップも付属していないため、ゼロ秒でメモ書きを始められる。
             </p>
           </a>
         </div>

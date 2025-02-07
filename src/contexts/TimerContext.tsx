@@ -3,24 +3,9 @@ import { createContext, useContext, useState, useEffect } from "react"
 import { useTimer } from "react-timer-hook"
 import localforage from "localforage"
 import { Preset } from "../types"
-
-type Summary = {
-  id: string
-  date: Date
-  setCount: number
-  totalTime: number
-  sets: {
-    setNumber: number
-    time: number
-  }[]
-}
+import { Summary } from "../types"
 
 type TimerContextType = {
-  defaultPresets: Preset[]
-  customPresets: Preset[]
-  selectedPreset: Preset
-  setSelectedPreset: (preset: Preset) => void
-  setCustomPresets: (presets: Preset[]) => void
   minutes: number
   seconds: number
   isRunning: boolean
@@ -30,9 +15,6 @@ type TimerContextType = {
   sessionCount: number
   totalTime: number
   addSession: () => void
-  theme: "light" | "dark"
-  setTheme: (theme: "light" | "dark") => void
-  saveCustomPresets: (customPresets: Preset[]) => void
   summaries: Summary[]
   saveSummary: (summary: Omit<Summary, 'id' | 'date'>) => void
 }
@@ -46,11 +28,9 @@ const defaultPresets: Preset[] = [
 ]
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const [customPresets, setCustomPresets] = useState<Preset[]>([])
-  const [selectedPreset, setSelectedPreset] = useState<Preset>(defaultPresets[0])
+  const [selectedPreset] = useState<Preset>(defaultPresets[0])
   const [sessionCount, setSessionCount] = useState(0)
   const [totalTime, setTotalTime] = useState(0)
-  const [theme, setTheme] = useState<"light" | "dark">("dark")
   const [summaries, setSummaries] = useState<Summary[]>([])
 
   const { seconds, minutes, isRunning, start, pause, restart } = useTimer({
@@ -60,34 +40,14 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    loadPresets()
     loadSessionInfo()
-    loadSummaries()
   }, [])
-
-  async function loadPresets() {
-    const storedPresets = await localforage.getItem<Preset[]>("customPresets")
-    if (storedPresets) {
-      setCustomPresets(storedPresets)
-    }
-  }
 
   async function loadSessionInfo() {
     const storedSessionCount = await localforage.getItem<number>("sessionCount")
     const storedTotalTime = await localforage.getItem<number>("totalTime")
     if (storedSessionCount) setSessionCount(storedSessionCount)
     if (storedTotalTime) setTotalTime(storedTotalTime)
-  }
-
-  async function loadSummaries() {
-    const storedSummaries = await localforage.getItem<Summary[]>("summaries")
-    if (storedSummaries) {
-      setSummaries(storedSummaries)
-    }
-  }
-
-  async function saveCustomPresets(customPresets: Preset[]) {
-    await localforage.setItem("customPresets", customPresets)
   }
 
   async function saveSessionInfo() {
@@ -116,11 +76,6 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   }
 
   const contextValue: TimerContextType = {
-    defaultPresets,
-    customPresets,
-    selectedPreset,
-    setSelectedPreset,
-    setCustomPresets,
     minutes,
     seconds,
     isRunning,
@@ -130,11 +85,8 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     sessionCount,
     totalTime,
     addSession,
-    theme,
-    setTheme,
-    saveCustomPresets,
     summaries,
-    saveSummary
+    saveSummary,
   }
 
   return <TimerContext.Provider value={contextValue}>{children}</TimerContext.Provider>
