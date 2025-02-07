@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react'
-import { useTimerContext } from '../contexts/TimerContext'
+import { useSummaryContext } from '../contexts/SummaryContext'
 import { Bar } from 'react-chartjs-2'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
-export default function Records() {
-  const { summaries } = useTimerContext()
+export default function Summary() {
+  const { summaries } = useSummaryContext()
   const [activeTab, setActiveTab] = useState('today')
 
   const filteredSummaries = useMemo(() => {
@@ -27,7 +27,7 @@ export default function Records() {
     })
   }, [summaries, activeTab])
 
-  const data = {
+  const memoizedChartData = useMemo(() => ({
     labels: ['セット数', '実施時間 (分)'],
     datasets: [{
       label: '記録',
@@ -39,7 +39,7 @@ export default function Records() {
       borderColor: 'rgba(75, 192, 192, 1)',
       borderWidth: 1
     }]
-  }
+  }), [filteredSummaries])
 
   const options = {
     scales: {
@@ -57,7 +57,7 @@ export default function Records() {
 
   return (
     <div className="card">
-      <h2 className="text-xl font-bold mb-4 text-primary">実施記録</h2>
+      <h2 className="text-2xl font-bold mb-4 text-primary">サマリー</h2>
       <div className="flex mb-4">
         {['today', 'month', 'year'].map((tab) => (
           <button
@@ -88,7 +88,7 @@ export default function Records() {
         </div>
       </div>
       <div className="h-64">
-        <Bar data={data} options={options} />
+        <Bar data={memoizedChartData} options={options} />
       </div>
     </div>
   )

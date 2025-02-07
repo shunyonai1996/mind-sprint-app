@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { useTimerContext } from '../contexts/TimerContext'
+import { usePresetContext } from '../contexts/PresetContext'
 import TimePickerWheel from './TimePickerWheel'
 import { Trash2 } from 'lucide-react'
 import { Preset } from '../types'
 
 export default function MyTimer() {
-  const { defaultPresets, customPresets, selectedPreset, saveSelectedPreset, setCustomPresets, saveCustomPresets } = useTimerContext()
+  const { defaultPresets, customPresets, selectedPreset, saveSelectedPreset, setCustomPresets, saveCustomPresets } = usePresetContext()
   const allPresets = [...defaultPresets, ...customPresets]
 
   type Minutes = string
@@ -82,7 +82,6 @@ export default function MyTimer() {
         </div>
       </div>
       <div className="flex flex-col mb-8">
-        <h3 className="text-2xl font-bold mb-4 text-primary">カスタム一覧</h3>
         {allPresets.map((preset, index) => (
           <div key={preset.name} className="flex justify-between gap-2 ">
             <div onClick={() => saveSelectedPreset(preset)} className="flex justify-center gap-2 items-center p-2 rounded-md">

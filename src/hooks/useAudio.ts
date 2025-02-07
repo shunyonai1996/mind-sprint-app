@@ -1,0 +1,60 @@
+import { useState, useEffect, useCallback } from 'react'
+import moveNextSet from '/public/sound/move_next_set.mp3'
+
+// AudioContextのシングルトンインスタンス
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+export function useAudio() {
+  const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  // 音声ファイルの初期ロード
+  useEffect(() => {
+    async function initializeAudio() {
+      try {
+        const response = await fetch(moveNextSet)
+        const arrayBuffer = await response.arrayBuffer()
+        const buffer = await audioContext.decodeAudioData(arrayBuffer)
+        setAudioBuffer(buffer)
+      } catch (error) {
+        console.error('音声ファイルのロード失敗:', error)
+      }
+    }
+    initializeAudio()
+  }, [])
+
+  // ユーザーインタラクションによるAudioContext再開
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+    }
+
+    document.addEventListener('click', handleUserInteraction)
+    document.addEventListener('touchstart', handleUserInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction)
+      document.removeEventListener('touchstart', handleUserInteraction)
+    }
+  }, [])
+
+  // 音声再生関数
+  const playSound = useCallback(() => {
+    if (audioBuffer && audioContext && !isPlaying) {
+      setIsPlaying(true)
+      const source = audioContext.createBufferSource()
+      source.buffer = audioBuffer
+      source.connect(audioContext.destination)
+      source.start(0)
+      
+      // 音声再生完了時にフラグをリセット
+      source.onended = () => {
+        setIsPlaying(false)
+      }
+    }
+  }, [audioBuffer, isPlaying])
+
+  return { playSound }
+}

@@ -1,40 +1,24 @@
 import React, { useState, useEffect } from "react"
 import { useTimerContext } from "../contexts/TimerContext"
+import { usePresetContext } from "../contexts/PresetContext"
+import { useThemeContext } from "../contexts/ThemeContext"
+import AssociateLinks from "./AssociateLinks"
+import { Play, Pause, SkipForward } from "lucide-react"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import { Play, Pause, SkipForward } from "lucide-react"
-import moveNextSet from '/public/sound/move_next_set.mp3'
-import AssociateLinks from "./AssociateLinks"
+import { useAudio } from '../hooks/useAudio'
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let audioBuffer: AudioBuffer | null = null;
-
-async function loadSound() {
-  try {
-    const response = await fetch(moveNextSet);
-    const arrayBuffer = await response.arrayBuffer();
-    audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-  } catch (error) {
-    console.error('音声ファイルのロードに失敗:', error);
-  }
-}
-
-function playSound() {
-  if (audioBuffer && audioContext) {
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(audioContext.destination);
-    source.start(0);
-  }
-}
 
 export default function Start() {
-  const { minutes, seconds, isRunning, start, pause, restart, selectedPreset, addSession, theme, setTheme, saveSummary } =
-    useTimerContext()
+  const { minutes, seconds, isRunning, pause, restart, addSession, saveSummary } = useTimerContext()
+  const { selectedPreset } = usePresetContext()
+  const { theme } = useThemeContext()
   const [showExitPopup, setShowExitPopup] = useState(false)
   const [completedSets, setCompletedSets] = useState<number[]>([])
   const [overTime, setOverTime] = useState(0)
   const [showSummaryPopup, setShowSummaryPopup] = useState(false)
+  const { playSound } = useAudio()
+  const [hasPlayedSound, setHasPlayedSound] = useState(false)
 
   const totalSeconds = selectedPreset.seconds
   const remainingSeconds = minutes * 60 + seconds
@@ -51,11 +35,6 @@ export default function Start() {
     }
   }, [remainingSeconds]);
 
-  useEffect(() => {
-    if (remainingSeconds == 0) {
-      playSound()
-    }
-  }, [remainingSeconds])
 
   useEffect(() => {
     const time = new Date()
@@ -73,7 +52,6 @@ export default function Start() {
     ? "#64b5f6"
     : "#4a90e2";
   const backgroundColor = theme === "dark" ? "#1a1a1a" : "#f5f7fa"
-  const textColor = theme === "dark" ? "#f5f5f5" : "#333333"
 
   function handleStart() {
     if (isRunning) {
@@ -110,24 +88,13 @@ export default function Start() {
   }
 
   useEffect(() => {
-    loadSound();
-  }, []);
-
-  useEffect(() => {
-    const handleUserInteraction = () => {
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-    };
-
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('touchstart', handleUserInteraction);
-
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-    };
-  }, []);
+    if (remainingSeconds === 0 && !hasPlayedSound) {
+      playSound()
+      setHasPlayedSound(true)
+    } else if (remainingSeconds > 0) {
+      setHasPlayedSound(false)
+    }
+  }, [remainingSeconds, playSound, hasPlayedSound])
 
   function handleSummaryClose(save: boolean) {
     if (save) {
@@ -157,7 +124,7 @@ export default function Start() {
         <div className="w-72 h-72 mx-auto mt-0 mb-0">
           <button
             onClick={() => handleExit()}
-            className="absolute top-1 left-1 px-4 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            className="absolute top-2 right-2 px-4 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           >
             終了
           </button>

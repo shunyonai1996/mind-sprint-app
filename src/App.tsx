@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import { TimerProvider, useTimerContext } from './contexts/TimerContext'
+import { PresetProvider, usePresetContext } from './contexts/PresetContext'
+import { SummaryProvider, useSummaryContext } from './contexts/SummaryContext'
+import { ThemeProvider, useThemeContext } from './contexts/ThemeContext'
 import Start from './components/Start'
 import MyTimer from './components/MyTimer'
-import Records from './components/Records'
+import Summary from './components/Summary'
 import Navigation from './components/Navigation'
 import { Moon, Sun } from 'lucide-react'
 
 function AppContent() {
-  const { theme, setTheme } = useTimerContext()
+  const { theme, setTheme } = useThemeContext()
   const [activeSection, setActiveSection] = useState('start')
 
   return (
@@ -25,9 +28,9 @@ function AppContent() {
             {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
           </button>
         </div>
-        {activeSection === 'start' && <Start />}
-        {activeSection === 'myTimer' && <MyTimer />}
-        {activeSection === 'records' && <Records />}
+        {activeSection === 'start' && <TimerProvider><PresetProvider><Start /></PresetProvider></TimerProvider>}
+        {activeSection === 'myTimer' && <PresetProvider><MyTimer /></PresetProvider>}
+        {activeSection === 'summary' && <SummaryProvider><Summary /></SummaryProvider>}
         <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />
       </div>
     </div>
@@ -36,9 +39,9 @@ function AppContent() {
 
 export default function App() {
   return (
-    <TimerProvider>
+    <ThemeProvider>
       <AppContent />
-    </TimerProvider>
+    </ThemeProvider>
   )
 }
 
