@@ -32,7 +32,6 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [sessionCount, setSessionCount] = useState(0)
   const [totalTime, setTotalTime] = useState(0)
   const [summaries, setSummaries] = useState<Summary[]>([])
-
   const { seconds, minutes, isRunning, start, pause, restart } = useTimer({
     expiryTimestamp: new Date(Date.now() + selectedPreset.seconds * 1000),
     onExpire: handleTimerExpire,
@@ -71,6 +70,8 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       id: crypto.randomUUID(),
       date: new Date()
     }
+    const storedSummaries = await localforage.getItem<Summary[]>("summaries")
+    setSummaries(storedSummaries || [])
     setSummaries(prev => [...prev, summary])
     await localforage.setItem('summaries', [...summaries, summary])
   }
