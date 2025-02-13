@@ -43,6 +43,15 @@ export default function Start() {
     pause()
   }, [selectedPreset])
 
+  useEffect(() => {
+    if (remainingSeconds === 0 && !hasPlayedSound) {
+      playSound()
+      setHasPlayedSound(true)
+    } else if (remainingSeconds > 0) {
+      setHasPlayedSound(false)
+    }
+  }, [remainingSeconds, playSound, hasPlayedSound])
+
   const displayTime =
   remainingSeconds == 0 ? overTime : remainingSeconds;
 
@@ -65,7 +74,7 @@ export default function Start() {
 
   function handleNextSet() {
     const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
-    setCompletedSets((prev) => [...prev, completedTime])
+    setCompletedSets(prev => [...prev, completedTime])
     setOverTime(0);
     addSession()
     const time = new Date()
@@ -86,15 +95,6 @@ export default function Start() {
     setShowExitPopup(false)
     setShowSummaryPopup(true)
   }
-
-  useEffect(() => {
-    if (remainingSeconds === 0 && !hasPlayedSound) {
-      playSound()
-      setHasPlayedSound(true)
-    } else if (remainingSeconds > 0) {
-      setHasPlayedSound(false)
-    }
-  }, [remainingSeconds, playSound, hasPlayedSound])
 
   function handleSummaryClose(save: boolean) {
     if (save) {
