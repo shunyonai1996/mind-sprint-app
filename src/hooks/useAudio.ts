@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import moveNextSet from '/public/sound/move_next_set.mp3'
 
-// AudioContextのシングルトンインスタンス
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 export function useAudio() {
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
-  // 音声ファイルの初期ロード
   useEffect(() => {
     async function initializeAudio() {
       try {
@@ -23,7 +21,6 @@ export function useAudio() {
     initializeAudio()
   }, [])
 
-  // ユーザーインタラクションによるAudioContext再開
   useEffect(() => {
     const handleUserInteraction = () => {
       if (audioContext.state === 'suspended') {
@@ -40,7 +37,6 @@ export function useAudio() {
     }
   }, [])
 
-  // 音声再生関数
   const playSound = useCallback(() => {
     if (audioBuffer && audioContext && !isPlaying) {
       setIsPlaying(true)
@@ -48,8 +44,6 @@ export function useAudio() {
       source.buffer = audioBuffer
       source.connect(audioContext.destination)
       source.start(0)
-      
-      // 音声再生完了時にフラグをリセット
       source.onended = () => {
         setIsPlaying(false)
       }

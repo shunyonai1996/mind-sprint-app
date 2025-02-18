@@ -3,7 +3,7 @@ import { useTimerContext } from "../contexts/TimerContext"
 import { usePresetContext } from "../contexts/PresetContext"
 import { useThemeContext } from "../contexts/ThemeContext"
 import AssociateLinks from "./AssociateLinks"
-import { Play, Pause, SkipForward } from "lucide-react"
+import { Play, Pause, SkipForward, Volume2, VolumeX } from "lucide-react"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import { useAudio } from '../hooks/useAudio'
@@ -19,6 +19,7 @@ export default function Start() {
   const [showSummaryPopup, setShowSummaryPopup] = useState(false)
   const { playSound } = useAudio()
   const [hasPlayedSound, setHasPlayedSound] = useState(false)
+  const [showSoundAlert, setShowSoundAlert] = useState(false)
 
   const totalSeconds = selectedPreset.seconds
   const remainingSeconds = minutes * 60 + seconds
@@ -70,6 +71,11 @@ export default function Start() {
       time.setSeconds(time.getSeconds() + Math.max(0, remainingSeconds))
       restart(time)
     }
+    console.log(window.innerWidth)
+    if (!isRunning && window.innerWidth <= 480) {
+      setShowSoundAlert(true)
+      setTimeout(() => setShowSoundAlert(false), 3000)
+    }
   }
 
   function handleNextSet() {
@@ -118,6 +124,12 @@ export default function Start() {
 
   return (
     <div className={`relative ${theme}`}>
+      {showSoundAlert && (
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50 animate-fade-in-down">
+          <Volume2 size={18} />
+          <span className="text-sm">マナーモード時は通知音が鳴りません</span>
+        </div>
+      )}
       <div
         className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds == 0 ? "bg-red-100 dark:bg-red-900" : ""}`}
       >
@@ -156,7 +168,17 @@ export default function Start() {
                 remainingSeconds === 0 ? "bg-gray-400 cursor-not-allowed" : isRunning ? "bg-secondary" : "bg-primary"
               }`}
             >
-              {isRunning ? <Pause size={48} /> : <Play size={48} />}
+              {isRunning ? (
+                <div className="flex flex-col items-center gap-1">
+                  <Pause size={24} />
+                  <p>ストップ</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1">
+                  <Play size={24} />
+                  <p>スタート</p>
+                </div>
+              )}
             </button>
             <button
               onClick={handleNextSet}
@@ -165,7 +187,10 @@ export default function Start() {
                 totalSeconds === remainingSeconds && completedSets.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-secondary"
               }`}
             >
-              <SkipForward size={48} />
+              <div className="flex flex-col items-center gap-1">
+                <SkipForward size={24} />
+                <p>次のセット</p>
+              </div>
             </button>
           </div>
           {completedSets.length > 0 && (
@@ -231,6 +256,10 @@ export default function Start() {
             </div>
           </div>
         )}
+      </div>
+      <div className="hidden sm:flex mt-2 mb-4 flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <VolumeX size={14} />
+        <span>マナーモード時、通知音無効</span>
       </div>
       <AssociateLinks></AssociateLinks>
     </div>
