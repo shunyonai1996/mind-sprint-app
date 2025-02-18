@@ -257,7 +257,7 @@ export default function Start() {
           </div>
         )}
       </div>
-      <div className="hidden sm:flex mt-2 mb-4 flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex sm:hidden mt-2 mb-4 flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
         <VolumeX size={14} />
         <span>マナーモード時、通知音無効</span>
       </div>
