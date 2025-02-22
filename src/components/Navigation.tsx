@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 
 type NavigationProps = {
-  activeSection: string
-  setActiveSection: (section: string) => void
+  activeSection: 'start' | 'myTimer' | 'summary'
+  setActiveSection: Dispatch<SetStateAction<'start' | 'myTimer' | 'summary'>>
 }
 
 export default function Navigation({ activeSection, setActiveSection }: NavigationProps) {
@@ -12,7 +12,7 @@ export default function Navigation({ activeSection, setActiveSection }: Navigati
         {['start', 'myTimer', 'summary'].map((section) => (
           <li key={section}>
             <button
-              onClick={() => setActiveSection(section)}
+              onClick={() => setActiveSection(section as 'start' | 'myTimer' | 'summary')}
               className={`p-4 ${activeSection === section ? 'text-primary' : 'text-gray-500'}`}
             >
               {section === 'start' ? 'スタート' : section === 'myTimer' ? 'マイタイマー' :  'サマリー'}
@@ -23,4 +23,3 @@ export default function Navigation({ activeSection, setActiveSection }: Navigati
     </nav>
   )
 }
-

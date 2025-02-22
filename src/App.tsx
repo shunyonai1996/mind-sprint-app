@@ -11,7 +11,7 @@ import { Moon, Sun } from 'lucide-react'
 
 function AppContent() {
   const { theme, setTheme } = useThemeContext()
-  const [activeSection, setActiveSection] = useState('start')
+  const [activeSection, setActiveSection] = useState<'start' | 'myTimer' | 'summary'>('start')
 
   return (
     <div className={`min-h-screen bg-background text-text p-4 pb-20 transition-colors duration-300 ${theme}`}>

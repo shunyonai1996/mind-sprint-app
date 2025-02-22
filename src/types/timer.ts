@@ -1,3 +1,6 @@
+import { Summary } from './summary';
+import { Preset } from './';
+
 export type TimerContextType = {
   minutes: number
   seconds: number
@@ -12,21 +15,17 @@ export type TimerContextType = {
   saveSummary: (summary: Omit<Summary, 'id' | 'date'>) => void
 }
 
-export type Summary = {
-  setCount: number
-  totalTime: number
-  sets: {
-    setNumber: number
-    time: number
-  }[]
-}
-
 export type PresetContextType = {
-  selectedPreset: {
-    seconds: number
-  }
+  defaultPresets: Preset[]
+  customPresets: Preset[]
+  selectedPreset: Preset
+  setSelectedPreset: (preset: Preset) => void
+  setCustomPresets: (presets: Preset[]) => void
+  saveCustomPresets: (customPresets: Preset[]) => void
+  saveSelectedPreset: (preset: Preset) => void
 }
 
 export type ThemeContextType = {
-  theme: string
+  theme: 'light' | 'dark'
+  toggleTheme: () => void
 }

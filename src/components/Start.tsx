@@ -13,17 +13,17 @@ export default function Start() {
   const { minutes, seconds, isRunning, pause, restart, addSession, saveSummary } = useTimerContext()
   const { selectedPreset } = usePresetContext()
   const { theme } = useThemeContext()
-  const [showExitPopup, setShowExitPopup] = useState(false)
+  const [showExitPopup, setShowExitPopup] = useState<boolean>(false)
   const [completedSets, setCompletedSets] = useState<number[]>([])
-  const [overTime, setOverTime] = useState(0)
-  const [showSummaryPopup, setShowSummaryPopup] = useState(false)
+  const [overTime, setOverTime] = useState<number>(0)
+  const [showSummaryPopup, setShowSummaryPopup] = useState<boolean>(false)
   const { playSound } = useAudio()
-  const [hasPlayedSound, setHasPlayedSound] = useState(false)
-  const [showSoundAlert, setShowSoundAlert] = useState(false)
+  const [hasPlayedSound, setHasPlayedSound] = useState<boolean>(false)
+  const [showSoundAlert, setShowSoundAlert] = useState<boolean>(false)
 
-  const totalSeconds = selectedPreset.seconds
-  const remainingSeconds = minutes * 60 + seconds
-  const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100
+  const totalSeconds:number = selectedPreset.seconds
+  const remainingSeconds:number = minutes * 60 + seconds
+  const progress:number = ((totalSeconds - remainingSeconds) / totalSeconds) * 100
 
   useEffect(() => {
     if (remainingSeconds == 0) {
@@ -52,17 +52,16 @@ export default function Start() {
     }
   }, [remainingSeconds, playSound, hasPlayedSound])
 
-  const displayTime =
+  const displayTime:number =
   remainingSeconds == 0 ? overTime : remainingSeconds;
 
-  const timerColor = remainingSeconds == 0
-    ? "#ff4136"
-    : theme === "dark"
-    ? "#64b5f6"
-    : "#4a90e2";
-  const backgroundColor = theme === "dark" ? "#1a1a1a" : "#f5f7fa"
+  const timerColor:string =
+  remainingSeconds == 0 ? "#ff4136" : theme === "dark" ? "#64b5f6" : "#4a90e2";
 
-  function handleStart() {
+  const backgroundColor:string =
+  theme === "dark" ? "#1a1a1a" : "#f5f7fa";
+
+  function handleStart(): void {
     if (isRunning) {
       pause()
     } else {
@@ -76,7 +75,7 @@ export default function Start() {
     }
   }
 
-  function handleNextSet() {
+  function handleNextSet(): void {
     const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
     setCompletedSets(prev => [...prev, completedTime])
     setOverTime(0);
@@ -86,11 +85,11 @@ export default function Start() {
     restart(time)
   }
 
-  function handleExit() {
+  function handleExit(): void {
     setShowExitPopup(true)
   }
 
-  function confirmExit() {
+  function confirmExit(): void {
     pause()
     const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
     if (completedTime > 0) {
@@ -100,7 +99,7 @@ export default function Start() {
     setShowSummaryPopup(true)
   }
 
-  function handleSummaryClose(save: boolean) {
+  function handleSummaryClose(save: boolean): void {
     if (save) {
       const summary = {
         setCount: completedSets.length,

@@ -1,7 +1,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import localforage from "localforage"
-import { Summary } from "../types"
+import { Summary } from "../types/summary"
 
 type SummaryContextType = {
   summaries: Summary[]

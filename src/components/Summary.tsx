@@ -49,7 +49,7 @@ export default function Summary() {
     },
   }
 
-  const formatTime = (totalSeconds: number) => {
+  function formatTime(totalSeconds: number): string {
     const minutes = Math.floor(totalSeconds / 60)
     const seconds = totalSeconds % 60
     return `${minutes.toString().padStart(2, '0')}分${seconds.toString().padStart(2, '0')}秒`

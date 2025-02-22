@@ -19,7 +19,7 @@ export default function Timer({
   restart,
   selectedPreset,
 }: TimerProps) {
-  function handleStart() {
+  function handleStart(): void {
     if (isRunning) {
       pause()
     } else {
