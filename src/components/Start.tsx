@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react"
 import { useTimerContext } from "../contexts/TimerContext"
 import { usePresetContext } from "../contexts/PresetContext"
 import { useThemeContext } from "../contexts/ThemeContext"
+import { TimerDisplay } from "./timer/TimerDisplay"
 import AssociateLinks from "./AssociateLinks"
 import { Play, Pause, SkipForward, Volume2, VolumeX } from "lucide-react"
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import { useAudio } from '../hooks/useAudio'
 
@@ -35,7 +35,6 @@ export default function Start() {
       setOverTime(0);
     }
   }, [remainingSeconds]);
-
 
   useEffect(() => {
     const time = new Date()
@@ -71,7 +70,6 @@ export default function Start() {
       time.setSeconds(time.getSeconds() + Math.max(0, remainingSeconds))
       restart(time)
     }
-    console.log(window.innerWidth)
     if (!isRunning && window.innerWidth <= 480) {
       setShowSoundAlert(true)
       setTimeout(() => setShowSoundAlert(false), 3000)
@@ -142,21 +140,13 @@ export default function Start() {
           </button>
 
           {/* タイマー */}
-          <CircularProgressbar
-            value={progress}
-            text={
-              remainingSeconds == 0
-                ? `-${Math.abs(Math.floor(displayTime / 60)).toString().padStart(2, "0")}:${Math.abs(displayTime % 60).toString().padStart(2, "0")}`
-                : `${Math.floor(displayTime / 60).toString().padStart(2, "0")}:${(displayTime % 60).toString().padStart(2, "0")}`
-            }
-            styles={buildStyles({
-              textSize: "16px",
-              pathTransitionDuration: 0.3,
-              pathColor: timerColor,
-              textColor: timerColor,
-              trailColor: theme === "dark" ? "#1a1a1a" : "#d6d6d6",
-              backgroundColor: backgroundColor,
-            })}
+          <TimerDisplay
+            progress={progress}
+            displayTime={displayTime}
+            remainingSeconds={remainingSeconds}
+            timerColor={timerColor}
+            backgroundColor={backgroundColor}
+            theme={theme}
           />
         </div>
 
