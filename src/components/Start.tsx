@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react"
 import { useTimerContext } from "../contexts/TimerContext"
 import { usePresetContext } from "../contexts/PresetContext"
 import { useThemeContext } from "../contexts/ThemeContext"
+import { TimerControls } from "./timer/TimerControls"
 import { TimerDisplay } from "./timer/TimerDisplay"
 import AssociateLinks from "./AssociateLinks"
-import { Play, Pause, SkipForward, Volume2, VolumeX } from "lucide-react"
+import {Volume2, VolumeX } from "lucide-react"
 import "react-circular-progressbar/dist/styles.css"
 import { useAudio } from '../hooks/useAudio'
 
@@ -149,52 +150,15 @@ export default function Start() {
           />
         </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={handleStart}
-              disabled={remainingSeconds === 0}
-              className={`rounded-full w-32 h-32 flex items-center justify-center totalSeconds text-white ${
-                remainingSeconds === 0 ? "bg-gray-400 cursor-not-allowed" : isRunning ? "bg-secondary" : "bg-primary"
-              }`}
-            >
-              {isRunning ? (
-                <div className="flex flex-col items-center gap-1">
-                  <Pause size={24} />
-                  <p>ストップ</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-1">
-                  <Play size={24} />
-                  <p>スタート</p>
-                </div>
-              )}
-            </button>
-            <button
-              onClick={handleNextSet}
-              disabled={totalSeconds === remainingSeconds && completedSets.length === 0}
-              className={`rounded-full w-32 h-32 flex items-center justify-center text-white ${
-                totalSeconds === remainingSeconds && completedSets.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-secondary"
-              }`}
-            >
-              <div className="flex flex-col items-center gap-1">
-                <SkipForward size={24} />
-                <p>次のセット</p>
-              </div>
-            </button>
-          </div>
-          {completedSets.length > 0 && (
-            <div className="mt-4 text-center">
-              <h3 className="text-lg font-bold mb-3 text-gray-800 dark:text-gray-200">完了</h3>
-              <ul className="space-y-2">
-            {completedSets.map((time, index) => (
-              <li
-                key={index}
-                className="text-base text-gray-600 dark:text-gray-300"
-              >{`セット${index + 1}：${Math.floor(time / 60)}分${(time % 60).toString().padStart(2, "0")}秒`}</li>
-            ))}
-          </ul>
-        </div>
-        )}
+        <TimerControls
+            isRunning={isRunning}
+            remainingSeconds={remainingSeconds}
+            totalSeconds={totalSeconds}
+            completedSets={completedSets}
+            handleStart={handleStart}
+            handleNextSet={handleNextSet}
+            handleExit={handleExit}
+        />
 
         {showExitPopup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
