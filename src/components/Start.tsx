@@ -133,13 +133,6 @@ export default function Start() {
         className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds == 0 ? "bg-red-100 dark:bg-red-900" : ""}`}
       >
         <div className="w-72 h-72 mx-auto mt-0 mb-0">
-          <button
-            onClick={() => handleExit()}
-            className="absolute top-2 right-2 px-4 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-          >
-            終了
-          </button>
-
           <TimerDisplay
             progress={progress}
             displayTime={displayTime}
@@ -178,7 +171,7 @@ export default function Start() {
         <VolumeX size={14} />
         <span>マナーモード時、通知音無効</span>
       </div>
-      <AssociateLinks></AssociateLinks>
+      <AssociateLinks />
     </div>
   )
 }
