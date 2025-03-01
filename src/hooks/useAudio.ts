@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import moveNextSet from '/public/sound/move_next_set.mp3'
+import audioData from '/public/sound/move_next_set.mp3'
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)() as AudioContext;
 
@@ -10,8 +10,8 @@ export function useAudio(): { playSound: () => void } {
   useEffect(() => {
     async function initializeAudio() {
       try {
-        const response = await fetch(moveNextSet)
-        const arrayBuffer = await response.arrayBuffer()
+        const res = await fetch(audioData)
+        const arrayBuffer = await res.arrayBuffer()
         const buffer = await audioContext.decodeAudioData(arrayBuffer)
         setAudioBuffer(buffer)
       } catch (error) {
