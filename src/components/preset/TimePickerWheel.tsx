@@ -15,7 +15,7 @@ export default function TimePickerWheel({ values, value, onChange, label }: Time
     const container = containerRef.current;
     if (!container) return;
 
-    const handleScroll = () => {
+    const handleScroll = (): void => {
       const itemHeight = 40;
       const scrollTop = container.scrollTop;
       const selectedIndex = Math.floor((scrollTop + itemHeight / 2) / itemHeight);

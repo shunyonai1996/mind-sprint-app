@@ -3,15 +3,15 @@ import { TimerProvider, useTimerContext } from './contexts/TimerContext'
 import { PresetProvider, usePresetContext } from './contexts/PresetContext'
 import { SummaryProvider, useSummaryContext } from './contexts/SummaryContext'
 import { ThemeProvider, useThemeContext } from './contexts/ThemeContext'
-import Start from './components/Start'
-import MyTimer from './components/MyTimer'
-import Summary from './components/Summary'
-import Navigation from './components/Navigation'
+import Timer from './components/timer/Timer'
+import MyTimer from './components/preset/Preset'
+import Summary from './components/summary/Summary'
+import Navigation from './components/common/layout/Navigation'
 import { Moon, Sun } from 'lucide-react'
 
 function AppContent() {
   const { theme, setTheme } = useThemeContext()
-  const [activeSection, setActiveSection] = useState('start')
+  const [activeSection, setActiveSection] = useState<'start' | 'myTimer' | 'summary'>('start')
 
   return (
     <div className={`min-h-screen bg-background text-text p-4 pb-20 transition-colors duration-300 ${theme}`}>
@@ -28,7 +28,7 @@ function AppContent() {
             {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
           </button>
         </div>
-        {activeSection === 'start' && <TimerProvider><PresetProvider><Start /></PresetProvider></TimerProvider>}
+        {activeSection === 'start' && <TimerProvider><PresetProvider><Timer /></PresetProvider></TimerProvider>}
         {activeSection === 'myTimer' && <PresetProvider><MyTimer /></PresetProvider>}
         {activeSection === 'summary' && <SummaryProvider><Summary /></SummaryProvider>}
         <Navigation activeSection={activeSection} setActiveSection={setActiveSection} />

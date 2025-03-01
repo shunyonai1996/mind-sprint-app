@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { usePresetContext } from '../contexts/PresetContext'
-import TimePickerWheel from './TimePickerWheel'
+import { usePresetContext } from '../../contexts/PresetContext'
+import TimePickerWheel from '../preset/TimePickerWheel'
 import { Trash2 } from 'lucide-react'
-import { Preset } from '../types'
+import { Preset } from '../../types'
 
 export default function MyTimer() {
   const { defaultPresets, customPresets, selectedPreset, saveSelectedPreset, setCustomPresets, saveCustomPresets } = usePresetContext()
@@ -17,7 +17,7 @@ export default function MyTimer() {
   const minuteValues: Minutes[] = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'))
   const secondValues: Seconds[] = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'))
 
-  function handleAddPreset() {
+  function handleAddPreset(): void {
     const minutesNum = parseInt(minutes, 10)
     const secondsNum = parseInt(seconds, 10)
     const totalSeconds = (minutesNum * 60) + secondsNum
@@ -44,11 +44,11 @@ export default function MyTimer() {
     }
   }
 
-  function handleResetToDefault() {
+  function handleResetToDefault(): void {
     saveSelectedPreset(defaultPresets[0])
   }
 
-  function handleDeletePreset(preset: Preset) {
+  function handleDeletePreset(preset: Preset): void {
     const updatedPresets = customPresets.filter(p => p.name !== preset.name)
     setCustomPresets(updatedPresets)
 
@@ -83,9 +83,9 @@ export default function MyTimer() {
       </div>
       <div className="flex flex-col mb-8">
         {allPresets.map((preset, index) => (
-          <div key={preset.name} className="flex justify-between gap-2 ">
+          <div key={preset.name} className="flex justify-between gap-2">
             <div onClick={() => saveSelectedPreset(preset)} className="flex justify-center gap-2 items-center p-2 rounded-md">
-              <span className="text-lg font-bold text-text">{index + 1}. </span>
+              <span className="text-lg font-bold text-text">{(index as number) + 1}. </span>
               <span className="text-xl font-bold text-text">{preset.name}</span>
             </div>
             <div className="flex justify-center gap-2 items-center p-1 rounded-md">

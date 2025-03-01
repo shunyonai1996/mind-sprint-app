@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
-import moveNextSet from '/public/sound/move_next_set.mp3'
+import audioData from '/public/sound/move_next_set.mp3'
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const audioContext = new (window.AudioContext || window.webkitAudioContext)() as AudioContext;
 
-export function useAudio() {
+export function useAudio(): { playSound: () => void } {
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     async function initializeAudio() {
       try {
-        const response = await fetch(moveNextSet)
-        const arrayBuffer = await response.arrayBuffer()
+        const res = await fetch(audioData)
+        const arrayBuffer = await res.arrayBuffer()
         const buffer = await audioContext.decodeAudioData(arrayBuffer)
         setAudioBuffer(buffer)
       } catch (error) {
@@ -22,7 +22,7 @@ export function useAudio() {
   }, [])
 
   useEffect(() => {
-    const handleUserInteraction = () => {
+    const handleUserInteraction = (): void => {
       if (audioContext.state === 'suspended') {
         audioContext.resume()
       }
@@ -37,7 +37,7 @@ export function useAudio() {
     }
   }, [])
 
-  const playSound = useCallback(() => {
+  const playSound = useCallback((): void => {
     if (audioBuffer && audioContext && !isPlaying) {
       setIsPlaying(true)
       const source = audioContext.createBufferSource()

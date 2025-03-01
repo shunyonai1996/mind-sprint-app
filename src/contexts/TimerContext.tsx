@@ -3,23 +3,10 @@ import { createContext, useContext, useState, useEffect } from "react"
 import { useTimer } from "react-timer-hook"
 import localforage from "localforage"
 import { Preset } from "../types"
-import { Summary } from "../types"
+import { Summary } from "../types/summary"
+import { TimerContextType } from "../types/timer"
 
-type TimerContextType = {
-  minutes: number
-  seconds: number
-  isRunning: boolean
-  start: () => void
-  pause: () => void
-  restart: (time: Date) => void
-  sessionCount: number
-  totalTime: number
-  addSession: () => void
-  summaries: Summary[]
-  saveSummary: (summary: Omit<Summary, 'id' | 'date'>) => void
-}
-
-const TimerContext = createContext<TimerContextType | undefined>(undefined)
+const TimerContext = createContext<TimerContextType | null>(null)
 
 const defaultPresets: Preset[] = [
   { id: "1", name: "1分", seconds: 60 },
@@ -27,7 +14,7 @@ const defaultPresets: Preset[] = [
   { id: "3", name: "1分5秒", seconds: 65 },
 ]
 
-export function TimerProvider({ children }: { children: React.ReactNode }) {
+export function TimerProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [selectedPreset] = useState<Preset>(defaultPresets[0])
   const [sessionCount, setSessionCount] = useState(0)
   const [totalTime, setTotalTime] = useState(0)
@@ -42,29 +29,29 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     loadSessionInfo()
   }, [])
 
-  async function loadSessionInfo() {
+  async function loadSessionInfo(): Promise<void> {
     const storedSessionCount = await localforage.getItem<number>("sessionCount")
     const storedTotalTime = await localforage.getItem<number>("totalTime")
     if (storedSessionCount) setSessionCount(storedSessionCount)
     if (storedTotalTime) setTotalTime(storedTotalTime)
   }
 
-  async function saveSessionInfo() {
+  async function saveSessionInfo(): Promise<void> {
     await localforage.setItem("sessionCount", sessionCount)
     await localforage.setItem("totalTime", totalTime)
   }
 
-  function handleTimerExpire() {
+  function handleTimerExpire(): void {
     addSession()
   }
 
-  function addSession() {
+  function addSession(): void {
     setSessionCount((prev) => prev + 1)
     setTotalTime((prev) => prev + selectedPreset.seconds)
     saveSessionInfo()
   }
 
-  const saveSummary = async (newSummary: Omit<Summary, 'id' | 'date'>) => {
+  async function saveSummary(newSummary: Omit<Summary, 'id' | 'date'>): Promise<void> {
     const summary: Summary = {
       ...newSummary,
       id: crypto.randomUUID(),
@@ -93,10 +80,10 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   return <TimerContext.Provider value={contextValue}>{children}</TimerContext.Provider>
 }
 
-export function useTimerContext() {
+export const useTimerContext = (): TimerContextType => {
   const context = useContext(TimerContext)
-  if (context === undefined) {
-    throw new Error("useTimerContext must be used within a TimerProvider")
+  if (!context) {
+    throw new Error('useTimerContext must be used within a TimerProvider')
   }
   return context
 }
