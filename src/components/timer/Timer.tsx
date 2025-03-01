@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react"
-import { useTimerContext } from "../contexts/TimerContext"
-import { usePresetContext } from "../contexts/PresetContext"
-import { useThemeContext } from "../contexts/ThemeContext"
-import { TimerControls } from "./timer/TimerControls"
-import { TimerDisplay } from "./timer/TimerDisplay"
+import { useTimerContext } from "../../contexts/TimerContext"
+import { usePresetContext } from "../../contexts/PresetContext"
+import { useThemeContext } from "../../contexts/ThemeContext"
+import { TimerControls } from "./TimerControls"
+import { TimerDisplay } from "./TimerDisplay"
 import { ExitConfirmPopup, SummaryPopup } from "./popup/TimerPopups"
-import AssociateLinks from "./AssociateLinks"
+import AssociateLinks from "../associate/AssociateLinks"
+import { useAudio } from "../../hooks/useAudio"
+import { SoundAlert } from "../common/alerts/SoundAlert"
 import "react-circular-progressbar/dist/styles.css"
-import { useAudio } from "../hooks/useAudio"
-import { SoundAlert } from "./alerts/SoundAlert"
 
 
 export default function Start() {

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { usePresetContext } from '../contexts/PresetContext'
-import TimePickerWheel from './TimePickerWheel'
+import { usePresetContext } from '../../contexts/PresetContext'
+import TimePickerWheel from '../preset/TimePickerWheel'
 import { Trash2 } from 'lucide-react'
-import { Preset } from '../types'
+import { Preset } from '../../types'
 
 export default function MyTimer() {
   const { defaultPresets, customPresets, selectedPreset, saveSelectedPreset, setCustomPresets, saveCustomPresets } = usePresetContext()
