@@ -57,10 +57,10 @@ export function TimerProvider({ children }: { children: React.ReactNode }): JSX.
       id: crypto.randomUUID(),
       date: new Date()
     }
-    const storedSummaries = await localforage.getItem<Summary[]>("summaries")
-    setSummaries(storedSummaries || [])
-    setSummaries(prev => [...prev, summary])
-    await localforage.setItem('summaries', [...summaries, summary])
+    const storedSummaries = await localforage.getItem<Summary[]>("summaries") || []
+    const updatedSummaries = [...storedSummaries, summary]
+    await localforage.setItem('summaries', updatedSummaries)
+    setSummaries(updatedSummaries)
   }
 
   const contextValue: TimerContextType = {
