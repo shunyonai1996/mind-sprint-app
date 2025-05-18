@@ -31,7 +31,7 @@ export default function MyTimer() {
       const newPreset = {
         id: crypto.randomUUID(),
         name: `${minutesNum}分${secondsNum}秒`,
-        seconds: totalSeconds,
+        seconds: totalSeconds
       }
       const updatedPresets = [...customPresets, newPreset]
       setCustomPresets(updatedPresets)

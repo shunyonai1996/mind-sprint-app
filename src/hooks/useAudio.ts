@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
-import audioData from '/public/sound/move_next_set.mp3'
+import countDownData from '/public/sound/count_down.mp3'
+import startData from '/public/sound/start.mp3'
+import finishData from '/public/sound/finish.mp3'
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)() as AudioContext;
 
-export function useAudio(): { playSound: () => void } {
+export function useAudio(soundUrl: string): { playSound: () => void } {
   const [audioBuffer, setAudioBuffer] = useState<AudioBuffer | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     async function initializeAudio() {
       try {
-        const res = await fetch(audioData)
+        const res = await fetch(soundUrl)
         const arrayBuffer = await res.arrayBuffer()
         const buffer = await audioContext.decodeAudioData(arrayBuffer)
         setAudioBuffer(buffer)
@@ -19,7 +21,7 @@ export function useAudio(): { playSound: () => void } {
       }
     }
     initializeAudio()
-  }, [])
+  }, [soundUrl])
 
   useEffect(() => {
     const handleUserInteraction = (): void => {
@@ -48,7 +50,19 @@ export function useAudio(): { playSound: () => void } {
         setIsPlaying(false)
       }
     }
-  }, [audioBuffer, isPlaying])
+  }, [audioBuffer])
 
   return { playSound }
+}
+
+export function useCountDownSound() {
+  return useAudio(countDownData)
+}
+
+export function useStartSound() {
+  return useAudio(startData)
+}
+
+export function useFinishSound() {
+  return useAudio(finishData)
 }

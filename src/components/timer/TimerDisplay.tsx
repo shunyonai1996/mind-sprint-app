@@ -21,11 +21,7 @@ export const TimerDisplay = ({
     <div className="w-72 h-72 mx-auto mt-0 mb-0">
       <CircularProgressbar
         value={progress}
-        text={
-          remainingSeconds == 0
-            ? `-${Math.abs(Math.floor(displayTime / 60)).toString().padStart(2, "0")}:${Math.abs(displayTime % 60).toString().padStart(2, "0")}`
-            : `${Math.floor(displayTime / 60).toString().padStart(2, "0")}:${(displayTime % 60).toString().padStart(2, "0")}`
-        }
+        text={`${Math.floor(displayTime / 60).toString().padStart(2, "0")}:${(displayTime % 60).toString().padStart(2, "0")}`}
         styles={buildStyles({
           textSize: "16px",
           pathTransitionDuration: 0.3,

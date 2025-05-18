@@ -8,6 +8,8 @@ type TimerControlsProps = {
   handleStart: () => void
   handleNextSet: () => void
   handleExit: () => void
+  currentSetNumber: number
+  targetSets: number
 }
 
 export function TimerControls({
@@ -17,7 +19,9 @@ export function TimerControls({
   completedSets,
   handleStart,
   handleNextSet,
-  handleExit
+  handleExit,
+  currentSetNumber,
+  targetSets
 }: TimerControlsProps) {
   return (
     <>
@@ -27,6 +31,11 @@ export function TimerControls({
       >
         終了
       </button>
+
+      <div className="text-center my-2 text-lg font-bold text-gray-800 dark:text-gray-200">
+        セット {currentSetNumber} / {targetSets}
+      </div>
+
       <div className="flex justify-between">
         <button
           onClick={handleStart}
