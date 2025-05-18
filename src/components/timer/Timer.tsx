@@ -6,10 +6,10 @@ import { TimerControls } from "./TimerControls"
 import { TimerDisplay } from "./TimerDisplay"
 import { ExitConfirmPopup, SummaryPopup } from "./popup/TimerPopups"
 import AssociateLinks from "../associate/AssociateLinks"
-import { useAudio } from "../../hooks/useAudio"
+import { useCountDownSound, useStartSound, useFinishSound } from "../../hooks/useAudio"
 import { SoundAlert } from "../common/alerts/SoundAlert"
+import { SetSelector } from "./SetSelector"
 import "react-circular-progressbar/dist/styles.css"
-
 
 export default function Start() {
   const { minutes, seconds, isRunning, pause, restart, addSession, saveSummary } = useTimerContext()
@@ -17,56 +17,58 @@ export default function Start() {
   const { theme } = useThemeContext()
   const [showExitPopup, setShowExitPopup] = useState<boolean>(false)
   const [completedSets, setCompletedSets] = useState<number[]>([])
-  const [overTime, setOverTime] = useState<number>(0)
   const [showSummaryPopup, setShowSummaryPopup] = useState<boolean>(false)
-  const { playSound } = useAudio()
+  const { playSound: playCountDown } = useCountDownSound()
+  const { playSound: playFinish } = useFinishSound()
+  const { playSound: playStart } = useStartSound()
   const [hasPlayedSound, setHasPlayedSound] = useState<boolean>(false)
   const [showSoundAlert, setShowSoundAlert] = useState<boolean>(false)
+  const [currentSetNumber, setCurrentSetNumber] = useState<number>(1)
+  const [targetSets, setTargetSets] = useState<number>(10)
 
   const totalSeconds:number = selectedPreset.seconds
   const remainingSeconds:number = minutes * 60 + seconds
   const progress:number = ((totalSeconds - remainingSeconds) / totalSeconds) * 100
 
   useEffect(() => {
-    if (remainingSeconds == 0) {
-      const interval = setInterval(() => {
-        setOverTime(prev => prev + 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    } else {
-      setOverTime(0);
-    }
-  }, [remainingSeconds]);
-
-  useEffect(() => {
     const time = new Date()
     time.setSeconds(time.getSeconds() + selectedPreset.seconds)
     restart(time)
     pause()
+    setCurrentSetNumber(1)
   }, [selectedPreset])
 
   useEffect(() => {
+    if (remainingSeconds <= 3 && remainingSeconds > 0 && isRunning) {
+        playCountDown()
+    } else if (remainingSeconds == 0 && !isRunning) {
+        playFinish()
+    }
+  }, [remainingSeconds, isRunning])
+
+  useEffect(() => {
     if (remainingSeconds === 0 && !hasPlayedSound) {
-      playSound()
       setHasPlayedSound(true)
+      const timeout = setTimeout(() => {
+        handleNextSet()
+      }, 1000)
+      return () => clearTimeout(timeout)
     } else if (remainingSeconds > 0) {
       setHasPlayedSound(false)
     }
-  }, [remainingSeconds, playSound, hasPlayedSound])
+  }, [remainingSeconds])
 
-  const displayTime:number =
-  remainingSeconds == 0 ? overTime : remainingSeconds;
+  const displayTime:number = remainingSeconds
 
-  const timerColor:string =
-  remainingSeconds == 0 ? "#ff4136" : theme === "dark" ? "#64b5f6" : "#4a90e2";
+  const timerColor:string = remainingSeconds <= 3 ? "#ff4136" : theme === "dark" ? "#64b5f6" : "#4a90e2";
 
-  const backgroundColor:string =
-  theme === "dark" ? "#1a1a1a" : "#f5f7fa";
+  const backgroundColor:string = theme === "dark" ? "#1a1a1a" : "#f5f7fa";
 
   function handleStart(): void {
     if (isRunning) {
       pause()
     } else {
+      playStart()
       const time = new Date()
       time.setSeconds(time.getSeconds() + Math.max(0, remainingSeconds))
       restart(time)
@@ -78,9 +80,17 @@ export default function Start() {
   }
 
   function handleNextSet(): void {
-    const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
+    const completedTime = totalSeconds - remainingSeconds
     setCompletedSets(prev => [...prev, completedTime])
-    setOverTime(0);
+
+    const nextSetNumber = currentSetNumber + 1
+    setCurrentSetNumber(nextSetNumber)
+
+    if (nextSetNumber > targetSets) {
+      confirmExit()
+      return
+    }
+
     addSession()
     const time = new Date()
     time.setSeconds(time.getSeconds() + selectedPreset.seconds)
@@ -93,7 +103,7 @@ export default function Start() {
 
   function confirmExit(): void {
     pause()
-    const completedTime = (totalSeconds - remainingSeconds) + (remainingSeconds == 0 ? overTime : 0);
+    const completedTime = totalSeconds - remainingSeconds
     if (completedTime > 0) {
       setCompletedSets(prev => [...prev, completedTime])
     }
@@ -115,6 +125,7 @@ export default function Start() {
     }
     setShowSummaryPopup(false)
     setCompletedSets([])
+    setCurrentSetNumber(1)
     const time = new Date()
     time.setSeconds(time.getSeconds() + selectedPreset.seconds)
     restart(time)
@@ -124,8 +135,14 @@ export default function Start() {
   return (
     <div className={`relative ${theme}`}>
       <div
-        className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds == 0 ? "bg-red-100 dark:bg-red-900" : ""}`}
+        className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds <= 3 ? "bg-red-100 dark:bg-red-900" : ""}`}
       >
+        <SetSelector
+          targetSets={targetSets}
+          setTargetSets={setTargetSets}
+          isDisabled={isRunning || currentSetNumber > 1}
+        />
+
         <TimerDisplay
           progress={progress}
           displayTime={displayTime}
@@ -143,6 +160,8 @@ export default function Start() {
           handleStart={handleStart}
           handleNextSet={handleNextSet}
           handleExit={handleExit}
+          currentSetNumber={currentSetNumber}
+          targetSets={targetSets}
         />
 
         {showExitPopup && (
