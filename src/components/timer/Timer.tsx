@@ -137,11 +137,6 @@ export default function Start() {
       <div
         className={`card ${isRunning ? "" : "opacity-75"} ${remainingSeconds <= 3 ? "bg-red-100 dark:bg-red-900" : ""}`}
       >
-        <SetSelector
-          targetSets={targetSets}
-          setTargetSets={setTargetSets}
-          isDisabled={isRunning || currentSetNumber > 1}
-        />
 
         <TimerDisplay
           progress={progress}
@@ -162,6 +157,12 @@ export default function Start() {
           handleExit={handleExit}
           currentSetNumber={currentSetNumber}
           targetSets={targetSets}
+        />
+
+        <SetSelector
+          targetSets={targetSets}
+          setTargetSets={setTargetSets}
+          isDisabled={isRunning || currentSetNumber > 1}
         />
 
         {showExitPopup && (

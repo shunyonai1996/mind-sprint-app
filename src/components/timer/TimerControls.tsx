@@ -27,7 +27,7 @@ export function TimerControls({
     <>
       <button
         onClick={handleExit}
-        className="absolute top-2 right-2 px-4 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+        className="absolute top-2 right-2 px-3 py-4 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
       >
         終了
       </button>

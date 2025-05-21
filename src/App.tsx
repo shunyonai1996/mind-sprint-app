@@ -16,16 +16,16 @@ function AppContent() {
   return (
     <div className={`min-h-screen bg-background text-text p-4 pb-20 transition-colors duration-300 ${theme}`}>
       <div className="max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-2">
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
             <img src="/icon.png" alt="MindSprint" className="h-[2em] w-auto" />
             MindSprint
           </h1>
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            className="px-5 py-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            className="px-3 py-3 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           >
-            {theme === "light" ? <Moon size={24} /> : <Sun size={24} />}
+            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
         </div>
         {activeSection === 'start' && <TimerProvider><PresetProvider><Timer /></PresetProvider></TimerProvider>}
