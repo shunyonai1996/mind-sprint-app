@@ -14,19 +14,26 @@ type SetSelectorProps = {
 
 export function SetSelector({ targetSets, setTargetSets, isDisabled }: SetSelectorProps) {
     return (
-        <div className="mt-16 mb-4 mx-4">
-            <select
-                value={targetSets}
-                onChange={(e) => setTargetSets(Number(e.target.value))}
-                className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                disabled={isDisabled}
-            >
+        <div className="mt-6 mb-4">
+            <div className="flex gap-2 justify-center">
                 {SET_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
+                    <button
+                        key={option.value}
+                        onClick={() => setTargetSets(option.value)}
+                        disabled={isDisabled}
+                        className={`
+                            px-4 py-2 rounded-lg font-medium transition-all
+                            ${targetSets === option.value
+                                ? 'bg-primary text-white'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }
+                            ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+                        `}
+                    >
+                        {option.label}
+                    </button>
                 ))}
-            </select>
+            </div>
         </div>
     )
 }
